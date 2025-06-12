@@ -25,9 +25,9 @@ class MyBrowser:
         self.result_page = source
 
     def check_next_page(self):
-        value = self.browser.find_element(By.ID, "DataTables_Table_0_next").get_attribute(
-            "class"
-        )
+        value = self.browser.find_element(
+            By.ID, "DataTables_Table_0_next"
+        ).get_attribute("class")
         return "disable" not in value
 
     def go_to_next_page(self):
@@ -41,14 +41,18 @@ firefox.open_page("IR")
 while True:
     saved_page = firefox.result_page
     if saved_page == firefox.get_real_time_page_source():
-        table = BeautifulSoup(saved_page,"html.parser").find_all("table")[0].get_text()
-        with open("IR_IPs.txt","a") as TABLE: 
-            TABLE.write(table)
+        table = (
+            BeautifulSoup(saved_page, "html.parser")
+            .find_all("table")[0]
+            .find("tbody")
+            .find_all("tr")
+        )
+        for row in table:
+            print("From TO")
+            [print(f"{ip.get_text()} ", end="\n") for ip in row.find_all("td")[:3]]
         if firefox.check_next_page():
-            print("im_hear_go_to_next")
             firefox.go_to_next_page()
         else:
-            print("no more page")
             break
     else:
         firefox.page = firefox.get_real_time_page_source()
